@@ -1,0 +1,7 @@
+/home/sammy/workspace/SU/Kode/build/CMakeFiles/Kode.dir
+/home/sammy/workspace/SU/Kode/build/CMakeFiles/edit_cache.dir
+/home/sammy/workspace/SU/Kode/build/CMakeFiles/rebuild_cache.dir
+/home/sammy/workspace/SU/Kode/build/CMakeFiles/list_install_components.dir
+/home/sammy/workspace/SU/Kode/build/CMakeFiles/install.dir
+/home/sammy/workspace/SU/Kode/build/CMakeFiles/install/local.dir
+/home/sammy/workspace/SU/Kode/build/CMakeFiles/install/strip.dir
