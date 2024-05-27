@@ -11,7 +11,7 @@ hero::hero(int hero) {
     query.exec(QString::fromStdString("SELECT * FROM helt WHERE ID = " + std::to_string(mKarakter)));
     QString navn;
     while (query.next()) {
-        navn = query.value(0).toString();
+        navn = query.value(1).toString();
         mAd = query.value(2).toInt();
         mHp = query.value(3).toInt();
         mXp = query.value(4).toInt();
@@ -42,6 +42,11 @@ int hero::getHp() {
     return mHp;
 }
 void hero::setHp(int hp) {
+    QSqlQuery iHp;
+    iHp.exec(QString::fromStdString("SELECT hp FROM helt WHERE ID = " + std::to_string(mKarakter)));
+    while (iHp.next()) {
+        mHp = iHp.value(0).toInt();
+    }
     mHp += hp;
     QString updateHp = "UPDATE helt SET hp = :hp WHERE ID = :ID";
     QSqlQuery Qhp;
@@ -59,16 +64,15 @@ int hero::getXp() {
 }
 void hero::setXp(int xp) {
     mXp+=xp;
-    if(mXp >= mLvl*500) {
-        mXp-=mLvl*500;
+    while(mXp >= mLvl*1000) {
+        mXp-=mLvl*1000;
         ++mLvl;
 
         std::random_device ran;
-        std::uniform_int_distribution<int> R1(1,2);
-        std::uniform_int_distribution<int> R2(2,5);
-        setAd(R1(ran));
-        setHp(R2(ran));
-        setSpd(R1(ran));
+        std::uniform_int_distribution<int> R3(0,2);
+        setAd(1);
+        setHp(2);
+        setSpd(R3(ran));
         QString updateLvl = "UPDATE helt SET lvl = :lvl WHERE ID = :ID";
         QSqlQuery Qlvl;
         Qlvl.prepare(updateLvl);
@@ -90,12 +94,12 @@ void hero::setXp(int xp) {
         qDebug() << "Failed" << Qxp.lastError().text();
     }
 
-    std::cout << "Navn: "<< mNavn << std::endl <<
+    /*std::cout << "Navn: "<< mNavn << std::endl <<
                  "Attack: " << mAd << std::endl <<
                  "Health: " << mHp << std::endl <<
                  "Xp: " << mXp << std::endl <<
                  "Level: " << mLvl << std::endl <<
-                 "Speed: " << mSpd << std::endl;
+                 "Speed: " << mSpd << std::endl;*/
 }
 
 int hero::getLvl() {
@@ -122,4 +126,8 @@ void hero::setSpd(int spd) {
 
 std::string hero::getNavn() {
     return mNavn;
+}
+
+void hero::getHit(int av) {
+    mHp -= av;
 }

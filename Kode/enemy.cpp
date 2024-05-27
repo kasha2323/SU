@@ -10,7 +10,7 @@ enemy::enemy(int enemy) {
     query.exec(QString::fromStdString("SELECT * FROM fjende WHERE ID = " + std::to_string(mKarakter)));
     QString navn;
     while (query.next()) {
-        navn = query.value(0).toString();
+        navn = query.value(1).toString();
         mAd = query.value(2).toInt();
         mHp = query.value(3).toInt();
         mXp = query.value(4).toInt();
@@ -38,4 +38,8 @@ int enemy::getSpd() {
 
 std::string enemy::getNavn() {
     return mNavn;
+}
+
+void enemy::getHit(int av) {
+    mHp -= av;
 }

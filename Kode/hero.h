@@ -11,6 +11,7 @@ class hero
 public:
     hero();
     hero(int hero);
+    virtual ~hero() {std::cout << "hero destroyed" << std::endl;}
 
     int getAd();
     void setAd(int ad);
@@ -26,9 +27,9 @@ public:
     int getSpd();
     void setSpd(int spd);
 
-
-
     std::string getNavn();
+
+    void getHit(int av);
 
 private:
     int mKarakter, mAd, mHp, mXp, mLvl, mSpd;

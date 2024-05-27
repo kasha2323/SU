@@ -44,17 +44,31 @@ int main(int argc, char *argv[]){
                 text = "(3) Delete Hero";
                 d1.slowPrint(text);
 
+                std::cout << std::endl;
+                text = "(0) Exit Game";
+                d1.slowPrint(text);
+
                 std::cin >> state;
+                std::system("clear");
+                if(state == 0) {
+                    break;
+                }
+
+
                 if(state > 3 || state < 1) {
                     state = 0;
-                    std::system("clear");
                 } else {
                     break;
                 }
+
             }
+            if(state == 0) {
+                break;
+            }
+
         } else if(state == 1) {                                     // Create character
             std::string navn;
-            int ad, hp, xp, lvl, spd;
+            int ad, hp, xp, lvl, spd, gold;
 
             std::system("clear");
             text = "Name Of Character: ";
@@ -63,12 +77,22 @@ int main(int argc, char *argv[]){
             std::cout << std::endl;
 
             ad = 2;
-            hp = 5;
+            hp = 10;
             xp = 0;
             lvl = 1;
             spd = 15;
+            gold = 0;
 
-            d1.insert(navn,ad,hp,xp,lvl,spd);
+            d1.insert(navn,ad,hp,xp,lvl,spd,gold);
+
+            QSqlQuery helte;
+            helte.exec(QString::fromStdString("SELECT ID FROM helt"));
+            while (helte.next()) {
+                int ID = helte.value(0).toInt();
+                if (helt<ID) {
+                    helt = ID;
+                }
+            }
 
             std::cin.ignore();
             state = 4;
@@ -80,13 +104,14 @@ int main(int argc, char *argv[]){
                 std::system("clear");
                 helte.exec(QString::fromStdString("SELECT * FROM helt"));
                 while (helte.next()) {
-                    d1.slowPrint("(" + helte.value(1).toString().toStdString() + ")");
-                    d1.slowPrint("Name: " + helte.value(0).toString().toStdString());
+                    d1.slowPrint("(" + helte.value(0).toString().toStdString() + ")");
+                    d1.slowPrint("Name: " + helte.value(1).toString().toStdString());
                     d1.slowPrint("   Attack: " + helte.value(2).toString().toStdString());
                     d1.slowPrint("   Health: " + helte.value(3).toString().toStdString());
                     d1.slowPrint("   Xp: " + helte.value(4).toString().toStdString());
                     d1.slowPrint("   Level: " + helte.value(5).toString().toStdString());
                     d1.slowPrint("   Speed: " + helte.value(6).toString().toStdString());
+                    d1.slowPrint("   Gold: " + helte.value(7).toString().toStdString());
                     std::cout << std::endl;
                 }
                 std::cin >> helt;
@@ -96,7 +121,6 @@ int main(int argc, char *argv[]){
                     int ID = helte.value(0).toInt();
                     std::cout << "ID: " << ID << " helt: " << helt << std::endl;
                     if(helt == ID) {
-                        hero h(helt);
                         state = 4;
                         i = 1;
                         break;
@@ -109,12 +133,12 @@ int main(int argc, char *argv[]){
         } else if(state == 3) {                                     // Delete character
             QSqlQuery helte;
             int i = 0;
-            while(i == 0) {
+            while(i == 0) {  // This while loop might not be needed
                 std::system("clear");
                 helte.exec(QString::fromStdString("SELECT * FROM helt"));
                 while (helte.next()) {
-                    d1.slowPrint("(" + helte.value(1).toString().toStdString() + ")");
-                    d1.slowPrint("Name: " + helte.value(0).toString().toStdString());
+                    d1.slowPrint("(" + helte.value(0).toString().toStdString() + ")");
+                    d1.slowPrint("Name: " + helte.value(1).toString().toStdString());
                     d1.slowPrint("   Attack: " + helte.value(2).toString().toStdString());
                     d1.slowPrint("   Health: " + helte.value(3).toString().toStdString());
                     d1.slowPrint("   Xp: " + helte.value(4).toString().toStdString());
@@ -140,20 +164,152 @@ int main(int argc, char *argv[]){
                 }
             }
         } else if(state == 4) {                                     // Choose what to do
+            int path = 0;
+            hero h(helt);
+            std::system("clear");
+            text = "You Have Loaded Character: ";
+            d1.slowPrint(text + h.getNavn());
 
+            std::cout << std::endl;
+
+            text = "(1) Fight Enemies";
+            d1.slowPrint(text);
+            text = "(2) Explore Caves";
+            d1.slowPrint(text);
+            text = "(3) Enter Shop";
+            d1.slowPrint(text);
+
+            // insert future functions
+
+            std::cout << std::endl;
+
+            text = "(0) Back To Menu";
+            d1.slowPrint(text);
+
+            std::cin >> path;
+
+
+            while(1) {
+                if(path == 1) {                                     // Choose enemy
+                    int enemi = 0;
+                    QSqlQuery fjende;
+                    int i = 0;
+
+                    std::system("clear");
+                    text = "Select Enemy To Fight:";
+                    d1.slowPrint(text);
+                    fjende.exec(QString::fromStdString("SELECT ID, name FROM fjende ORDER BY ID"));
+                    while (fjende.next()) {
+                        d1.slowPrint("(" + fjende.value(0).toString().toStdString() + ")");
+                        d1.slowPrint("Name: " + fjende.value(1).toString().toStdString());
+
+                        std::cout << std::endl;
+                    }
+                    text = "(0) Back To Menu";
+                    std::cout << std::endl;
+                    d1.slowPrint(text);
+
+                    std::cin >> enemi;
+
+                    if(enemi == 0) {
+                        path = 0;
+                        break;
+                    }
+
+                    enemy e(enemi);
+
+                    std::system("clear");
+
+
+                    d1.slowPrint(h.getNavn() + " Is Fighthing " + e.getNavn());
+
+                    while (h.getHp() > 0 && e.getHp() > 0 && e.getHp() < 10000) {   //Fight enemy
+                        std::cout << std::endl;
+                        d1.slowPrint(h.getNavn());
+                        d1.slowPrint("   Hp: " + std::to_string(h.getHp()));
+                        d1.slowPrint("   Attack: " + std::to_string(h.getAd()));
+                        d1.slowPrint(e.getNavn());
+                        d1.slowPrint("   Hp: " + std::to_string(e.getHp()));
+                        d1.slowPrint("   Attack: " + std::to_string(e.getAd()));
+                        if(h.getSpd() >= e.getSpd()) {
+                            d1.slowPrint(h.getNavn() + " Hits " + e.getNavn());
+                            e.getHit(h.getAd());
+                            if(e.getHp() <= 0) {
+                                d1.slowPrint(e.getNavn() + " Is Dead");
+                                std::cout << std::endl;
+                                std::cout << std::endl;
+                                d1.slowPrint(h.getNavn());
+                                d1.slowPrint("   Hp Remaining: " + std::to_string(h.getHp()));
+                                d1.slowPrint("   Ad: " + std::to_string(h.getAd()));
+                                std::cout << std::endl;
+                                h.setXp(e.getXp());
+                                d1.slowPrint("Xp: " + std::to_string(h.getXp()) + "/" + std::to_string(h.getLvl()*1000));
+                                d1.slowPrint("Press Enter To Continue");
+                                std::cin.ignore();
+                                std::cin.ignore();
+                                continue;
+                            }
+                            d1.slowPrint(e.getNavn() + " Hits " + h.getNavn());
+                            h.getHit(e.getAd());
+                            if(h.getHp() <= 0) {
+                                d1.slowPrint(h.getNavn() + " Is Dead");
+                                std::cout << std::endl;
+                                std::cout << std::endl;
+                                d1.slowPrint(e.getNavn());
+                                d1.slowPrint("   Hp Remaining: " + std::to_string(e.getHp()));
+                                d1.slowPrint("   Ad: " + std::to_string(e.getAd()));
+                                std::cout << std::endl;
+                                d1.slowPrint("Press Enter To Continue");
+                                std::cin.ignore();
+                                std::cin.ignore();
+                                continue;
+                            }
+
+                        } else if(h.getSpd() < e.getSpd()) {
+                            d1.slowPrint(e.getNavn() + " Hits " + h.getNavn());
+                            h.getHit(e.getAd());
+                            if(h.getHp() <= 0) {
+                                d1.slowPrint(h.getNavn() + " Is Dead");
+                                std::cout << std::endl;
+                                std::cout << std::endl;
+                                d1.slowPrint(e.getNavn());
+                                d1.slowPrint("   Hp Remaining: " + std::to_string(e.getHp()));
+                                d1.slowPrint("   Ad: " + std::to_string(e.getAd()));
+                                std::cout << std::endl;
+                                d1.slowPrint("Press Enter To Continue");
+                                std::cin.ignore();
+                                std::cin.ignore();
+                                continue;
+                            }
+                            d1.slowPrint(h.getNavn() + " Hits " + e.getNavn());
+                            e.getHit(h.getAd());
+                            if(e.getHp() <= 0) {
+                                d1.slowPrint(e.getNavn() + " Is Dead");
+                                std::cout << std::endl;
+                                std::cout << std::endl;
+                                d1.slowPrint(h.getNavn());
+                                d1.slowPrint("   Hp Remaining: " + std::to_string(h.getHp()));
+                                d1.slowPrint("   Ad: " + std::to_string(h.getAd()));
+                                std::cout << std::endl;
+                                h.setXp(e.getXp());
+                                d1.slowPrint("Lvl: " + std::to_string(h.getLvl()));
+                                d1.slowPrint("Xp: " + std::to_string(h.getXp()) + "/" + std::to_string(h.getLvl()*1000));
+                                d1.slowPrint("Press Enter To Continue");
+                                std::cin.ignore();
+                                std::cin.ignore();
+                                continue;
+                            }
+                        }
+                    }
+                } else if(path == 2) {                              // Explore caves
+
+                } else {
+                    state = 0;
+                    break;
+                }
+            }
         }
     }
-
-
-
-
-
-    hero h(2);
-
-    enemy e(2);
-
-    int Hej = 2;
-    int Hallo = 3;
 
     //for (int i = 0; i < 1000; ++i) {
     //    std::cout << i << std::flush << std::endl;
