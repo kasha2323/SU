@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/Kode.dir/cave.cpp.o"
+  "CMakeFiles/Kode.dir/cave.cpp.o.d"
   "CMakeFiles/Kode.dir/diverse.cpp.o"
   "CMakeFiles/Kode.dir/diverse.cpp.o.d"
   "CMakeFiles/Kode.dir/enemy.cpp.o"

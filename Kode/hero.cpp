@@ -9,17 +9,15 @@ hero::hero(int hero) {
     mKarakter = hero;
     QSqlQuery query;
     query.exec(QString::fromStdString("SELECT * FROM helt WHERE ID = " + std::to_string(mKarakter)));
-    QString navn;
     while (query.next()) {
-        navn = query.value(1).toString();
-        mAd = query.value(2).toInt();
-        mHp = query.value(3).toInt();
-        mXp = query.value(4).toInt();
-        mLvl = query.value(5).toInt();
-        mSpd = query.value(6).toInt();
+        mNavn = query.value("name").toString().toStdString();
+        mAd = query.value("ad").toInt();
+        mHp = query.value("hp").toInt();
+        mXp = query.value("xp").toInt();
+        mLvl = query.value("lvl").toInt();
+        mSpd = query.value("spd").toInt();
+        mGold = query.value("gold").toInt();
     }
-
-    mNavn = navn.toStdString();
 }
 
 int hero::getAd() {
@@ -130,4 +128,20 @@ std::string hero::getNavn() {
 
 void hero::getHit(int av) {
     mHp -= av;
+}
+
+int hero::getGold() {
+    return mGold;
+}
+void hero::setGold(int gold) {
+    mGold += gold;
+    QString updateGold = "UPDATE helt SET gold = :gold WHERE ID = :ID";
+    QSqlQuery Qgold;
+    Qgold.prepare(updateGold);
+    Qgold.bindValue(":ID", mKarakter);
+    Qgold.bindValue(":gold", mGold);
+
+    if (!Qgold.exec()) {
+        qDebug() << "Failed" << Qgold.lastError().text();
+    }
 }

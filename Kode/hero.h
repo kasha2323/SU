@@ -31,8 +31,11 @@ public:
 
     void getHit(int av);
 
+    int getGold();
+    void setGold(int gold);
+
 private:
-    int mKarakter, mAd, mHp, mXp, mLvl, mSpd;
+    int mKarakter, mAd, mHp, mXp, mLvl, mSpd, mGold;
     std::string mNavn;
 };
 

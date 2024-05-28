@@ -12,7 +12,7 @@ class enemy
 public:
     enemy();
     enemy(int enemy);
-    virtual ~enemy() {std::cout << "enemy destroyed" << std::endl;}
+    virtual ~enemy() {std::cout << std::endl;}
 
     int getAd();
 
@@ -26,8 +26,10 @@ public:
 
     void getHit(int av);
 
+    int getGold();
+
 private:
-    int mKarakter, mAd, mHp, mXp, mSpd;
+    int mKarakter, mAd, mHp, mXp, mSpd, mGold;
     std::string mNavn;
 };
 

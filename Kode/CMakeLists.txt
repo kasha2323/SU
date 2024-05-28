@@ -14,7 +14,8 @@ endif()
 add_executable(Kode main.cpp
     hero.h hero.cpp
     enemy.h enemy.cpp
-    diverse.h diverse.cpp)
+    diverse.h diverse.cpp
+    cave.h cave.cpp)
 
 target_link_libraries(Kode Qt5::Sql Qt5::Quick)
 

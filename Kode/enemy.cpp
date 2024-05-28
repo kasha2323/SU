@@ -8,16 +8,14 @@ enemy::enemy(int enemy) {
     mKarakter = enemy;
     QSqlQuery query;
     query.exec(QString::fromStdString("SELECT * FROM fjende WHERE ID = " + std::to_string(mKarakter)));
-    QString navn;
     while (query.next()) {
-        navn = query.value(1).toString();
-        mAd = query.value(2).toInt();
-        mHp = query.value(3).toInt();
-        mXp = query.value(4).toInt();
-        mSpd = query.value(5).toInt();
+        mNavn = query.value("name").toString().toStdString();
+        mAd = query.value("ad").toInt();
+        mHp = query.value("hp").toInt();
+        mXp = query.value("xp").toInt();
+        mSpd = query.value("spd").toInt();
+        mGold = query.value("gold").toInt();
     }
-
-    mNavn = navn.toStdString();
 }
 
 int enemy::getAd() {
@@ -42,4 +40,8 @@ std::string enemy::getNavn() {
 
 void enemy::getHit(int av) {
     mHp -= av;
+}
+
+int enemy::getGold() {
+    return mGold;
 }

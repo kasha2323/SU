@@ -11,6 +11,7 @@
 #include "hero.h"
 #include "enemy.h"
 #include "diverse.h"
+#include "cave.h"
 
 int main(int argc, char *argv[]){
     QCoreApplication a(argc, argv);
@@ -104,8 +105,8 @@ int main(int argc, char *argv[]){
                 std::system("clear");
                 helte.exec(QString::fromStdString("SELECT * FROM helt"));
                 while (helte.next()) {
-                    d1.slowPrint("(" + helte.value(0).toString().toStdString() + ")");
-                    d1.slowPrint("Name: " + helte.value(1).toString().toStdString());
+                    d1.slowPrint("(" + helte.value(1).toString().toStdString() + ")");
+                    d1.slowPrint("Name: " + helte.value(0).toString().toStdString());
                     d1.slowPrint("   Attack: " + helte.value(2).toString().toStdString());
                     d1.slowPrint("   Health: " + helte.value(3).toString().toStdString());
                     d1.slowPrint("   Xp: " + helte.value(4).toString().toStdString());
@@ -137,8 +138,8 @@ int main(int argc, char *argv[]){
                 std::system("clear");
                 helte.exec(QString::fromStdString("SELECT * FROM helt"));
                 while (helte.next()) {
-                    d1.slowPrint("(" + helte.value(0).toString().toStdString() + ")");
-                    d1.slowPrint("Name: " + helte.value(1).toString().toStdString());
+                    d1.slowPrint("(" + helte.value(1).toString().toStdString() + ")");
+                    d1.slowPrint("Name: " + helte.value(0).toString().toStdString());
                     d1.slowPrint("   Attack: " + helte.value(2).toString().toStdString());
                     d1.slowPrint("   Health: " + helte.value(3).toString().toStdString());
                     d1.slowPrint("   Xp: " + helte.value(4).toString().toStdString());
@@ -200,8 +201,8 @@ int main(int argc, char *argv[]){
                     d1.slowPrint(text);
                     fjende.exec(QString::fromStdString("SELECT ID, name FROM fjende ORDER BY ID"));
                     while (fjende.next()) {
-                        d1.slowPrint("(" + fjende.value(0).toString().toStdString() + ")");
-                        d1.slowPrint("Name: " + fjende.value(1).toString().toStdString());
+                        d1.slowPrint("(" + fjende.value("ID").toString().toStdString() + ")");
+                        d1.slowPrint("Name: " + fjende.value("name").toString().toStdString());
 
                         std::cout << std::endl;
                     }
@@ -302,6 +303,155 @@ int main(int argc, char *argv[]){
                         }
                     }
                 } else if(path == 2) {                              // Explore caves
+                    int caves;
+                    QSqlQuery Qcave;
+                    std::system("clear");
+                    text = "Select Cave To Explore:";
+                    d1.slowPrint(text);
+                    Qcave.exec(QString::fromStdString("SELECT ID, name FROM grotte ORDER BY ID"));
+                    while (Qcave.next()) {
+                        d1.slowPrint("(" + Qcave.value("ID").toString().toStdString() + ")");
+                        d1.slowPrint("Name: " + Qcave.value("name").toString().toStdString());
+
+                        std::cout << std::endl;
+                    }
+
+                    text = "(0) Back To Menu";
+                    std::cout << std::endl;
+                    d1.slowPrint(text);
+
+                    std::cin >> caves;
+
+
+
+                    if(caves == 0) {
+                        path = 0;
+                        break;
+                    }
+
+                    cave c(caves);
+
+                    std::system("clear");
+
+                    d1.slowPrint(h.getNavn() + " Enters The " + c.getNavn());
+
+                    c.enemies();
+
+                    while(1) {
+                        int next = c.nextEnemy();
+                        //std::cout << h.back() << std::endl;
+                        //h.pop_back();
+
+                        enemy e(next);
+
+                        d1.slowPrint("A " + e.getNavn() + " Approaches You");
+
+                        while (h.getHp() > 0 && e.getHp() > 0 && e.getHp() < 10000) {   //Fight enemy
+                            std::cout << std::endl;
+                            d1.slowPrint(h.getNavn());
+                            d1.slowPrint("   Hp: " + std::to_string(h.getHp()));
+                            d1.slowPrint("   Attack: " + std::to_string(h.getAd()));
+                            d1.slowPrint(e.getNavn());
+                            d1.slowPrint("   Hp: " + std::to_string(e.getHp()));
+                            d1.slowPrint("   Attack: " + std::to_string(e.getAd()));
+                            if(h.getSpd() >= e.getSpd()) {
+                                d1.slowPrint(h.getNavn() + " Hits " + e.getNavn());
+                                e.getHit(h.getAd());
+                                if(e.getHp() <= 0) {
+                                    std::cout << std::endl;
+                                    d1.slowPrint(e.getNavn() + " Dropped " + std::to_string(e.getGold()) + " Gold");
+                                    h.setGold(e.getGold());
+                                    d1.slowPrint(h.getNavn() + " Has " + std::to_string(h.getGold()) + " Gold");
+                                    std::cout << std::endl;
+                                    d1.slowPrint(h.getNavn());
+                                    d1.slowPrint("   Hp Remaining: " + std::to_string(h.getHp()));
+                                    d1.slowPrint("   Ad: " + std::to_string(h.getAd()));
+                                    std::cout << std::endl;
+                                    d1.slowPrint("Press Enter To Continue");
+                                    std::cin.ignore();
+                                    std::cin.ignore();
+                                    std::system("clear");
+                                    continue;
+                                }
+                                d1.slowPrint(e.getNavn() + " Hits " + h.getNavn());
+                                h.getHit(e.getAd());
+                                if(h.getHp() <= 0) {
+                                    d1.slowPrint(h.getNavn() + " Is Dead");
+                                    std::cout << std::endl;
+                                    std::cout << std::endl;
+                                    d1.slowPrint(e.getNavn());
+                                    d1.slowPrint("   Hp Remaining: " + std::to_string(e.getHp()));
+                                    d1.slowPrint("   Ad: " + std::to_string(e.getAd()));
+                                    std::cout << std::endl;
+                                    d1.slowPrint("Press Enter To Continue");
+                                    std::cin.ignore();
+                                    std::cin.ignore();
+                                    path = 2;
+                                    caves = 0;
+                                    break;
+                                }
+
+                            } else if(h.getSpd() < e.getSpd()) {
+                                d1.slowPrint(e.getNavn() + " Hits " + h.getNavn());
+                                h.getHit(e.getAd());
+                                if(h.getHp() <= 0) {
+                                    d1.slowPrint(h.getNavn() + " Is Dead");
+                                    std::cout << std::endl;
+                                    std::cout << std::endl;
+                                    d1.slowPrint(e.getNavn());
+                                    d1.slowPrint("   Hp Remaining: " + std::to_string(e.getHp()));
+                                    d1.slowPrint("   Ad: " + std::to_string(e.getAd()));
+                                    std::cout << std::endl;
+                                    d1.slowPrint("Press Enter To Continue");
+                                    std::cin.ignore();
+                                    std::cin.ignore();
+                                    path = 2;
+                                    caves = 0;
+                                    break;
+                                }
+                                d1.slowPrint(h.getNavn() + " Hits " + e.getNavn());
+                                e.getHit(h.getAd());
+                                if(e.getHp() <= 0) {
+                                    std::cout << std::endl;
+                                    d1.slowPrint(e.getNavn() + " Dropped " + std::to_string(e.getGold()) + " Gold");
+                                    h.setGold(e.getGold());
+                                    d1.slowPrint(h.getNavn() + " Has " + std::to_string(h.getGold()) + " Gold");
+
+                                    std::cout << std::endl;
+                                    d1.slowPrint(h.getNavn());
+                                    d1.slowPrint("   Hp Remaining: " + std::to_string(h.getHp()));
+                                    d1.slowPrint("   Ad: " + std::to_string(h.getAd()));
+                                    std::cout << std::endl;
+                                    d1.slowPrint("Press Enter To Continue");
+                                    std::cin.ignore();
+                                    std::cin.ignore();
+                                    std::system("clear");
+                                    continue;
+                                }
+                            }
+                        }
+
+                        if(c.emptyCheck()) {
+                            if(h.getHp() > 0) {
+                                d1.slowPrint(h.getNavn() + " Successfully Looted " + std::to_string(c.getGold()) + " Gold From The " + c.getNavn());
+                                h.setGold(c.getGold());
+                                d1.slowPrint(h.getNavn() + " Has " + std::to_string(h.getGold()) + " Gold");
+                                std::cout << std::endl;
+                                d1.slowPrint(h.getNavn());
+                                d1.slowPrint("   Hp Remaining: " + std::to_string(h.getHp()));
+                                d1.slowPrint("   Ad: " + std::to_string(h.getAd()));
+                                h.setXp(0);
+                                std::cout << std::endl;
+                                d1.slowPrint("Press Enter To Continue");
+                                std::cin.ignore();
+                                std::system("clear");
+                            }
+                            path = 2;
+                            caves = 0;
+                            state = 4;
+                            break;
+                        }
+                    }
 
                 } else {
                     state = 0;
