@@ -13,6 +13,8 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/sammy/workspace/SU/Kode/enemy.cpp" "CMakeFiles/Kode.dir/enemy.cpp.o" "gcc" "CMakeFiles/Kode.dir/enemy.cpp.o.d"
   "/home/sammy/workspace/SU/Kode/hero.cpp" "CMakeFiles/Kode.dir/hero.cpp.o" "gcc" "CMakeFiles/Kode.dir/hero.cpp.o.d"
   "/home/sammy/workspace/SU/Kode/main.cpp" "CMakeFiles/Kode.dir/main.cpp.o" "gcc" "CMakeFiles/Kode.dir/main.cpp.o.d"
+  "/home/sammy/workspace/SU/Kode/shop.cpp" "CMakeFiles/Kode.dir/shop.cpp.o" "gcc" "CMakeFiles/Kode.dir/shop.cpp.o.d"
+  "/home/sammy/workspace/SU/Kode/weapon.cpp" "CMakeFiles/Kode.dir/weapon.cpp.o" "gcc" "CMakeFiles/Kode.dir/weapon.cpp.o.d"
   )
 
 # Targets to which this target links.

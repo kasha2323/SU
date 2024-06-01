@@ -9,6 +9,10 @@ file(REMOVE_RECURSE
   "CMakeFiles/Kode.dir/hero.cpp.o.d"
   "CMakeFiles/Kode.dir/main.cpp.o"
   "CMakeFiles/Kode.dir/main.cpp.o.d"
+  "CMakeFiles/Kode.dir/shop.cpp.o"
+  "CMakeFiles/Kode.dir/shop.cpp.o.d"
+  "CMakeFiles/Kode.dir/weapon.cpp.o"
+  "CMakeFiles/Kode.dir/weapon.cpp.o.d"
   "Kode"
   "Kode.pdb"
 )

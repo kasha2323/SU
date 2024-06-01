@@ -16,6 +16,10 @@ void diverse::slowPrint(std::string text) {
     std::cout << std::endl;
 }
 
+void diverse::fastPrint(std::string text) {
+    std::cout << text << std::endl;
+}
+
 void diverse::insert(std::string navn, int ad, int hp, int xp, int lvl, int spd, int gold) {
     QSqlQuery insert;
     insert.prepare("INSERT INTO helt (name, ID, ad, hp, xp, lvl, spd, gold) VALUES (:name, :ID, :ad, :hp, :xp, :lvl, :spd, :gold)");

@@ -17,6 +17,7 @@ hero::hero(int hero) {
         mLvl = query.value("lvl").toInt();
         mSpd = query.value("spd").toInt();
         mGold = query.value("gold").toInt();
+        mMana = query.value("mana").toInt();
     }
 }
 
@@ -71,6 +72,7 @@ void hero::setXp(int xp) {
         setAd(1);
         setHp(2);
         setSpd(R3(ran));
+        setMana(3);
         QString updateLvl = "UPDATE helt SET lvl = :lvl WHERE ID = :ID";
         QSqlQuery Qlvl;
         Qlvl.prepare(updateLvl);
@@ -144,4 +146,33 @@ void hero::setGold(int gold) {
     if (!Qgold.exec()) {
         qDebug() << "Failed" << Qgold.lastError().text();
     }
+}
+
+int hero::getID() {
+    return mKarakter;
+}
+
+int hero::getMana() {
+    return mMana;
+}
+void hero::setMana(int mana) {
+    QSqlQuery iMana;
+    iMana.exec(QString::fromStdString("SELECT mana FROM helt WHERE ID = " + std::to_string(mKarakter)));
+    while (iMana.next()) {
+        mMana = iMana.value("mana").toInt();
+    }
+    mMana += mana;
+    QString updateMana = "UPDATE helt SET mana = :mana WHERE ID = :ID";
+    QSqlQuery Qmana;
+    Qmana.prepare(updateMana);
+    Qmana.bindValue(":ID", mKarakter);
+    Qmana.bindValue(":mana", mMana);
+
+    if (!Qmana.exec()) {
+        qDebug() << "Failed" << Qmana.lastError().text();
+    }
+}
+
+void hero::drainMana(int mana) {
+    mMana -= mana;
 }

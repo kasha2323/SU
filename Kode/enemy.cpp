@@ -15,6 +15,7 @@ enemy::enemy(int enemy) {
         mXp = query.value("xp").toInt();
         mSpd = query.value("spd").toInt();
         mGold = query.value("gold").toInt();
+        mType = query.value("typeID").toInt();
     }
 }
 
@@ -44,4 +45,8 @@ void enemy::getHit(int av) {
 
 int enemy::getGold() {
     return mGold;
+}
+
+int enemy::getType() {
+    return mType;
 }

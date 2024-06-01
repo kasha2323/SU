@@ -15,6 +15,8 @@ public:
 
     void slowPrint(std::string text);
 
+    void fastPrint(std::string text);
+
     void insert(std::string navn, int ad, int hp, int xp, int lvl, int spd, int gold);
 
     void del(int ID);

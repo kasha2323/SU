@@ -15,7 +15,9 @@ add_executable(Kode main.cpp
     hero.h hero.cpp
     enemy.h enemy.cpp
     diverse.h diverse.cpp
-    cave.h cave.cpp)
+    cave.h cave.cpp
+    shop.h shop.cpp
+    weapon.h weapon.cpp)
 
 target_link_libraries(Kode Qt5::Sql Qt5::Quick)
 

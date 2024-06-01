@@ -34,8 +34,15 @@ public:
     int getGold();
     void setGold(int gold);
 
+    int getID();
+
+    int getMana();
+    void setMana(int mana);
+    void drainMana(int mana);
+
+
 private:
-    int mKarakter, mAd, mHp, mXp, mLvl, mSpd, mGold;
+    int mKarakter, mAd, mHp, mXp, mLvl, mSpd, mGold, mMana;
     std::string mNavn;
 };
 

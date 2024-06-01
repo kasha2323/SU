@@ -3,6 +3,8 @@
 #include <QSqlDatabase>
 #include <iostream>
 
+#include <math.h>
+
 #include <cstdlib>
 
 #include <chrono>
@@ -12,6 +14,8 @@
 #include "enemy.h"
 #include "diverse.h"
 #include "cave.h"
+#include "weapon.h"
+#include "shop.h"
 
 int main(int argc, char *argv[]){
     QCoreApplication a(argc, argv);
@@ -23,6 +27,7 @@ int main(int argc, char *argv[]){
     db.open();
 
     diverse d1;
+    weapon w;
     std::string text;
     int state = 0;
     int helt = 0;
@@ -105,14 +110,15 @@ int main(int argc, char *argv[]){
                 std::system("clear");
                 helte.exec(QString::fromStdString("SELECT * FROM helt"));
                 while (helte.next()) {
-                    d1.slowPrint("(" + helte.value(1).toString().toStdString() + ")");
-                    d1.slowPrint("Name: " + helte.value(0).toString().toStdString());
-                    d1.slowPrint("   Attack: " + helte.value(2).toString().toStdString());
-                    d1.slowPrint("   Health: " + helte.value(3).toString().toStdString());
-                    d1.slowPrint("   Xp: " + helte.value(4).toString().toStdString());
-                    d1.slowPrint("   Level: " + helte.value(5).toString().toStdString());
-                    d1.slowPrint("   Speed: " + helte.value(6).toString().toStdString());
-                    d1.slowPrint("   Gold: " + helte.value(7).toString().toStdString());
+                    d1.slowPrint("(" + helte.value("ID").toString().toStdString() + ")");
+                    d1.slowPrint("Name: " + helte.value("name").toString().toStdString());
+                    d1.slowPrint("   Attack: " + helte.value("ad").toString().toStdString());
+                    d1.slowPrint("   Health: " + helte.value("hp").toString().toStdString());
+                    d1.slowPrint("   Xp: " + helte.value("xp").toString().toStdString());
+                    d1.slowPrint("   Level: " + helte.value("lvl").toString().toStdString());
+                    d1.slowPrint("   Speed: " + helte.value("spd").toString().toStdString());
+                    d1.slowPrint("   Gold: " + helte.value("gold").toString().toStdString());
+                    d1.slowPrint("   Mana: " + helte.value("mana").toString().toStdString());
                     std::cout << std::endl;
                 }
                 std::cin >> helt;
@@ -120,7 +126,7 @@ int main(int argc, char *argv[]){
                 while (helte.next()) {
 
                     int ID = helte.value(0).toInt();
-                    std::cout << "ID: " << ID << " helt: " << helt << std::endl;
+
                     if(helt == ID) {
                         state = 4;
                         i = 1;
@@ -168,8 +174,7 @@ int main(int argc, char *argv[]){
             int path = 0;
             hero h(helt);
             std::system("clear");
-            text = "You Have Loaded Character: ";
-            d1.slowPrint(text + h.getNavn());
+            d1.slowPrint("You Have Loaded Character " + h.getNavn() + " With The " + w.getName());
 
             std::cout << std::endl;
 
@@ -178,6 +183,8 @@ int main(int argc, char *argv[]){
             text = "(2) Explore Caves";
             d1.slowPrint(text);
             text = "(3) Enter Shop";
+            d1.slowPrint(text);
+            text = "(4) Choose Weapon";
             d1.slowPrint(text);
 
             // insert future functions
@@ -192,6 +199,7 @@ int main(int argc, char *argv[]){
 
             while(1) {
                 if(path == 1) {                                     // Choose enemy
+                    h.setHp(0);
                     int enemi = 0;
                     QSqlQuery fjende;
                     int i = 0;
@@ -199,10 +207,16 @@ int main(int argc, char *argv[]){
                     std::system("clear");
                     text = "Select Enemy To Fight:";
                     d1.slowPrint(text);
-                    fjende.exec(QString::fromStdString("SELECT ID, name FROM fjende ORDER BY ID"));
+                    fjende.exec(QString::fromStdString("SELECT ID, name, typeID FROM fjende ORDER BY ID"));
                     while (fjende.next()) {
                         d1.slowPrint("(" + fjende.value("ID").toString().toStdString() + ")");
                         d1.slowPrint("Name: " + fjende.value("name").toString().toStdString());
+                        int type = fjende.value("typeID").toInt();
+                        if (w.type(type) == 2) {
+                            d1.slowPrint("   Strong Against");
+                        } else if (w.type(type) == 0.5) {
+                            d1.slowPrint("   Weak Against");
+                        }
 
                         std::cout << std::endl;
                     }
@@ -221,20 +235,33 @@ int main(int argc, char *argv[]){
 
                     std::system("clear");
 
+                    double adv = w.type(e.getType());
 
                     d1.slowPrint(h.getNavn() + " Is Fighthing " + e.getNavn());
 
                     while (h.getHp() > 0 && e.getHp() > 0 && e.getHp() < 10000) {   //Fight enemy
                         std::cout << std::endl;
+                        int i = 1;
+
                         d1.slowPrint(h.getNavn());
                         d1.slowPrint("   Hp: " + std::to_string(h.getHp()));
                         d1.slowPrint("   Attack: " + std::to_string(h.getAd()));
+                        d1.slowPrint("   Mana: " + std::to_string(h.getMana()) + "/" + std::to_string(w.getMana()));
+                        if(w.getMana() > h.getMana()) {
+                            i = 0;
+                            adv = 1;
+                        } else {
+                            h.drainMana(w.getMana());
+                        }
                         d1.slowPrint(e.getNavn());
                         d1.slowPrint("   Hp: " + std::to_string(e.getHp()));
                         d1.slowPrint("   Attack: " + std::to_string(e.getAd()));
+
+
+
                         if(h.getSpd() >= e.getSpd()) {
                             d1.slowPrint(h.getNavn() + " Hits " + e.getNavn());
-                            e.getHit(h.getAd());
+                            e.getHit((h.getAd()+w.getDamage()*i)*adv);
                             if(e.getHp() <= 0) {
                                 d1.slowPrint(e.getNavn() + " Is Dead");
                                 std::cout << std::endl;
@@ -242,6 +269,9 @@ int main(int argc, char *argv[]){
                                 d1.slowPrint(h.getNavn());
                                 d1.slowPrint("   Hp Remaining: " + std::to_string(h.getHp()));
                                 d1.slowPrint("   Ad: " + std::to_string(h.getAd()));
+                                d1.slowPrint("   Weapon: " + std::to_string(w.getDamage()));
+                                d1.slowPrint("   Multiplier: " + std::to_string(adv));
+                                d1.slowPrint("   Damage: " + std::to_string(static_cast<int>((h.getAd()+w.getDamage()*i)*adv)));
                                 std::cout << std::endl;
                                 h.setXp(e.getXp());
                                 d1.slowPrint("Xp: " + std::to_string(h.getXp()) + "/" + std::to_string(h.getLvl()*1000));
@@ -283,7 +313,7 @@ int main(int argc, char *argv[]){
                                 continue;
                             }
                             d1.slowPrint(h.getNavn() + " Hits " + e.getNavn());
-                            e.getHit(h.getAd());
+                            e.getHit((h.getAd()+w.getDamage()*i)*adv);
                             if(e.getHp() <= 0) {
                                 d1.slowPrint(e.getNavn() + " Is Dead");
                                 std::cout << std::endl;
@@ -291,6 +321,9 @@ int main(int argc, char *argv[]){
                                 d1.slowPrint(h.getNavn());
                                 d1.slowPrint("   Hp Remaining: " + std::to_string(h.getHp()));
                                 d1.slowPrint("   Ad: " + std::to_string(h.getAd()));
+                                d1.slowPrint("   Weapon: " + std::to_string(w.getDamage()));
+                                d1.slowPrint("   Multiplier: " + std::to_string(adv));
+                                d1.slowPrint("   Damage: " + std::to_string(static_cast<int>((h.getAd()+w.getDamage()*i)*adv)));
                                 std::cout << std::endl;
                                 h.setXp(e.getXp());
                                 d1.slowPrint("Lvl: " + std::to_string(h.getLvl()));
@@ -304,6 +337,7 @@ int main(int argc, char *argv[]){
                     }
                 } else if(path == 2) {                              // Explore caves
                     int caves;
+                    h.setHp(0);
                     QSqlQuery Qcave;
                     std::system("clear");
                     text = "Select Cave To Explore:";
@@ -337,12 +371,14 @@ int main(int argc, char *argv[]){
 
                     c.enemies();
 
-                    while(1) {
+                    while(caves >=1 && caves <= 7) {
                         int next = c.nextEnemy();
-                        //std::cout << h.back() << std::endl;
-                        //h.pop_back();
+
 
                         enemy e(next);
+                        double adv = w.type(e.getType());
+
+
 
                         d1.slowPrint("A " + e.getNavn() + " Approaches You");
 
@@ -351,12 +387,20 @@ int main(int argc, char *argv[]){
                             d1.slowPrint(h.getNavn());
                             d1.slowPrint("   Hp: " + std::to_string(h.getHp()));
                             d1.slowPrint("   Attack: " + std::to_string(h.getAd()));
+                            d1.slowPrint("   Mana: " + std::to_string(h.getMana()));
                             d1.slowPrint(e.getNavn());
                             d1.slowPrint("   Hp: " + std::to_string(e.getHp()));
                             d1.slowPrint("   Attack: " + std::to_string(e.getAd()));
+                            int i = 1;
+                            if(w.getMana() > h.getMana()) {
+                                i = 0;
+                                adv = 1;
+                            } else {
+                                h.drainMana(w.getMana());
+                            }
                             if(h.getSpd() >= e.getSpd()) {
                                 d1.slowPrint(h.getNavn() + " Hits " + e.getNavn());
-                                e.getHit(h.getAd());
+                                e.getHit((h.getAd()+w.getDamage()*i)*adv);
                                 if(e.getHp() <= 0) {
                                     std::cout << std::endl;
                                     d1.slowPrint(e.getNavn() + " Dropped " + std::to_string(e.getGold()) + " Gold");
@@ -366,6 +410,9 @@ int main(int argc, char *argv[]){
                                     d1.slowPrint(h.getNavn());
                                     d1.slowPrint("   Hp Remaining: " + std::to_string(h.getHp()));
                                     d1.slowPrint("   Ad: " + std::to_string(h.getAd()));
+                                    d1.slowPrint("   Weapon: " + std::to_string(w.getDamage()));
+                                    d1.slowPrint("   Multiplier: " + std::to_string(adv));
+                                    d1.slowPrint("   Damage: " + std::to_string(static_cast<int>((h.getAd()+w.getDamage()*i)*adv)));
                                     std::cout << std::endl;
                                     d1.slowPrint("Press Enter To Continue");
                                     std::cin.ignore();
@@ -410,7 +457,7 @@ int main(int argc, char *argv[]){
                                     break;
                                 }
                                 d1.slowPrint(h.getNavn() + " Hits " + e.getNavn());
-                                e.getHit(h.getAd());
+                                e.getHit((h.getAd()+w.getDamage()*i)*adv);
                                 if(e.getHp() <= 0) {
                                     std::cout << std::endl;
                                     d1.slowPrint(e.getNavn() + " Dropped " + std::to_string(e.getGold()) + " Gold");
@@ -421,6 +468,9 @@ int main(int argc, char *argv[]){
                                     d1.slowPrint(h.getNavn());
                                     d1.slowPrint("   Hp Remaining: " + std::to_string(h.getHp()));
                                     d1.slowPrint("   Ad: " + std::to_string(h.getAd()));
+                                    d1.slowPrint("   Weapon: " + std::to_string(w.getDamage()));
+                                    d1.slowPrint("   Multiplier: " + std::to_string(adv));
+                                    d1.slowPrint("   Damage: " + std::to_string(static_cast<int>((h.getAd()+w.getDamage()*i)*adv)));
                                     std::cout << std::endl;
                                     d1.slowPrint("Press Enter To Continue");
                                     std::cin.ignore();
@@ -440,7 +490,9 @@ int main(int argc, char *argv[]){
                                 d1.slowPrint(h.getNavn());
                                 d1.slowPrint("   Hp Remaining: " + std::to_string(h.getHp()));
                                 d1.slowPrint("   Ad: " + std::to_string(h.getAd()));
-                                h.setXp(0);
+                                d1.slowPrint("   Mana: " + std::to_string(h.getMana()) + "/" + std::to_string(w.getMana()));
+
+
                                 std::cout << std::endl;
                                 d1.slowPrint("Press Enter To Continue");
                                 std::cin.ignore();
@@ -452,9 +504,139 @@ int main(int argc, char *argv[]){
                             break;
                         }
                     }
+                } else if(path == 3) {
+                    int butik;
+                    QSqlQuery Qshop;
+                    QSqlQuery Qpurchased;
+                    QSqlQuery Qrequire;
+                    QSqlQuery Qrequire2;
+                    std::system("clear");
 
-                } else {
+
+                        d1.slowPrint("You Enter The Shop With " + std::to_string(h.getGold()) + " Gold:");
+                        std::cout << std::endl;
+                    while(1) {
+
+
+                        Qshop.exec(QString::fromStdString("SELECT items.ID, items.name, items.gold, items.damage, type.name, items.ID, items.mana FROM items, type WHERE type.ID = items.typeID ORDER BY ID"));
+                        while (Qshop.next()) {
+                            std::string ID = Qshop.value("items.ID").toString().toStdString();
+                            d1.slowPrint("(" + ID + ")");
+                            d1.slowPrint(Qshop.value("items.name").toString().toStdString());
+                            d1.fastPrint("   Damage: " + Qshop.value("items.damage").toString().toStdString());
+                            d1.fastPrint("   Price: " + Qshop.value("items.gold").toString().toStdString());
+                            d1.fastPrint("   Type: " + Qshop.value("type.name").toString().toStdString());
+                            d1.fastPrint("   Mana: " + Qshop.value("items.mana").toString().toStdString());
+
+                            Qpurchased.exec(QString::fromStdString("SELECT ID FROM purchased WHERE itemID = " + ID + " AND heltID = " + std::to_string(h.getID())));
+                            Qrequire.exec(QString::fromStdString("SELECT ID FROM requirement WHERE itemID = " + ID));
+                            if (Qpurchased.next()) {
+                                d1.fastPrint("      Purchased");
+                            } else if (Qrequire.next()) {
+                                Qrequire2.exec(QString::fromStdString("SELECT items.name FROM requirement, items WHERE requirement.itemID = " + ID + " AND requirement.requireID = items.ID"));
+                                while (Qrequire2.next()) {
+                                    d1.fastPrint("      Requires: " + Qrequire2.value("items.name").toString().toStdString());
+                                }
+
+                            }
+
+                            std::cout << std::endl;
+                        }
+
+
+                        std::cout << std::endl;
+                        d1.slowPrint("(0) Back To Menu");
+
+                        std::cin >> butik;
+
+                        if(butik == 0) {
+                            path = 0;
+                            break;
+                        }
+
+                        shop s(butik);
+
+                        int guld;
+                        Qshop.exec(QString::fromStdString("SELECT gold FROM items WHERE ID = " + std::to_string(butik)));
+                        while (Qshop.next()) {
+                            guld = Qshop.value("gold").toInt();
+                        }
+
+
+
+
+                        if (guld <= h.getGold()) {
+                            std::system("clear");
+
+                            int loan = 0;
+                            s.insert(h.getID(), loan);
+                            h.setGold(loan);
+                        } else {
+                            std::system("clear");
+                            d1.slowPrint("You Can't Buy That With Only " + std::to_string(h.getGold()) + " Gold!");
+                        }
+                    }
+                    if(butik == 0) {
+                        path = 0;
+                        break;
+                    }
+                } else if (path==4){
+
+                    int wep;
+
+                    QSqlQuery Qweapon;
+                    std::system("clear");
+                    text = "Pick One Of Your Weapons:";
+                    d1.slowPrint(text);
+                    std::cout << std::endl;
+                    d1.slowPrint("(0)");
+                    d1.slowPrint("Name: Fists");
+                    std::cout << std::endl;
+
+                    Qweapon.exec(QString::fromStdString("SELECT items.ID, items.name, items.damage, type.name, items.mana FROM type, items, purchased WHERE type.ID = items.typeID AND items.ID = purchased.itemID AND purchased.heltID = " + std::to_string(h.getID()) + " ORDER BY ID"));
+                    while (Qweapon.next()) {
+                        d1.slowPrint("(" + Qweapon.value("items.ID").toString().toStdString() + ")");
+                        d1.slowPrint("Name: " + Qweapon.value("items.name").toString().toStdString());
+                        d1.slowPrint("Damage: " + Qweapon.value("items.damage").toString().toStdString());
+                        d1.slowPrint("Type: " + Qweapon.value("type.name").toString().toStdString());
+                        d1.slowPrint("Mana: " + Qweapon.value("items.mana").toString().toStdString());
+
+
+                        std::cout << std::endl;
+                    }
+
+
+                    std::cout << std::endl;
+
+
+                    std::cin >> wep;
+
+                    Qweapon.exec(QString::fromStdString("SELECT items.ID FROM items, purchased WHERE items.ID = purchased.itemID AND purchased.heltID = " + std::to_string(h.getID())));
+                    while (Qweapon.next()) {
+
+                        int ID = Qweapon.value(0).toInt();
+
+                        if(wep == ID) {
+
+                            w.setWeapon(wep);
+                            break;
+                        } else if(wep == 0) {
+                            w.setWeapon(wep);
+                            break;
+                        }
+                    }
+
+
+
+
+
+                    path = 0;
+                    break;
+
+                } else if (path==0){
                     state = 0;
+                    break;
+                } else {
                     break;
                 }
             }

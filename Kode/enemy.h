@@ -28,8 +28,10 @@ public:
 
     int getGold();
 
+    int getType();
+
 private:
-    int mKarakter, mAd, mHp, mXp, mSpd, mGold;
+    int mKarakter, mAd, mHp, mXp, mSpd, mGold, mType;
     std::string mNavn;
 };
 
