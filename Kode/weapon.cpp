@@ -38,16 +38,12 @@ void weapon::setWeapon(int weapon) {
             mGold = query.value("items.gold").toInt();
             mMana = query.value("items.mana").toInt();
         }
-
-
-
     } else {
         mDamage = 0;
         mName = "Fists";
         mType = 0;
         mGold = 0;
         mMana = 0;
-
     }
 }
 int weapon::getMana() {
